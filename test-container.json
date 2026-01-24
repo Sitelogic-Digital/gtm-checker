@@ -1,0 +1,63 @@
+{
+  "containerVersion": {
+    "containerId": "GTM-TEST123",
+    "containerVersionId": "42",
+    "tag": [
+      {
+        "name": "GA4 Configuration",
+        "type": "googtag",
+        "tagId": "1",
+        "firingTriggerId": ["2147479553"],
+        "parameter": [],
+        "fingerprint": "1737724800000"
+      },
+      {
+        "name": "Legacy UA Pageview",
+        "type": "ua",
+        "tagId": "2",
+        "firingTriggerId": ["2147479553"],
+        "parameter": [],
+        "fingerprint": "1672531200000"
+      },
+      {
+        "name": "Facebook Pixel - Old",
+        "type": "sp",
+        "tagId": "3",
+        "paused": true,
+        "firingTriggerId": ["2147479553"],
+        "parameter": [],
+        "fingerprint": "1704067200000"
+      }
+    ],
+    "trigger": [
+      {
+        "name": "All Pages",
+        "type": "pageview",
+        "triggerId": "2147479553",
+        "fingerprint": "1609459200000"
+      },
+      {
+        "name": "Unused Click",
+        "type": "click",
+        "triggerId": "100",
+        "fingerprint": "1640995200000"
+      }
+    ],
+    "variable": [
+      {
+        "name": "UA Settings",
+        "type": "gas",
+        "variableId": "1",
+        "parameter": [],
+        "fingerprint": "1640995200000"
+      },
+      {
+        "name": "Unused Variable",
+        "type": "v",
+        "variableId": "2",
+        "parameter": [],
+        "fingerprint": "1640995200000"
+      }
+    ]
+  }
+}
