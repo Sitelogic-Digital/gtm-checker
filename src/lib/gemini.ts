@@ -2,7 +2,10 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function getAIFixRecommendation(apiKey: string, issueTitle: string, issueDescription: string, affectedItems: string[]) {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel(
+        { model: "gemini-1.5-flash" },
+        { apiVersion: "v1" }
+    );
 
     const prompt = `
     You are an expert Google Tag Manager architect. 
