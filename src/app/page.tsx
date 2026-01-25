@@ -8,12 +8,13 @@ import IssuesList from "@/components/IssuesList";
 import InventoryTabs from "@/components/InventoryTabs";
 import { parseGTMContainer } from "@/lib/gtm-parser";
 import { AuditReport } from "@/lib/types";
-import { ArrowLeft, RefreshCw, Github, Loader2 } from "lucide-react";
+import { ArrowLeft, RefreshCw, Github, Loader2, ChevronRight } from "lucide-react";
 
 import { SitelogicLogo } from "@/components/SitelogicLogo";
 import { Sparkles, ArrowUpRight } from "lucide-react";
 
 import { exportReportToPDF } from "@/lib/pdf-export";
+import GTMExportGuide from "@/components/GTMExportGuide";
 
 export default function Home() {
   const [report, setReport] = useState<AuditReport | null>(null);
@@ -95,10 +96,24 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-xl text-zinc-400 max-w-2xl mx-auto font-medium"
+              className="text-xl text-zinc-400 max-w-2xl mx-auto font-medium mb-4"
             >
-              Deep dive into your GTM container exports. Discover leaks, cleanup opportunities, and legacy tags in seconds.
+              Deep dive into the health of your GTM setup. Discover issues, cleanup opportunities, and legacy tags in seconds.
             </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <a
+                href="#instructions"
+                className="inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-white transition-colors group"
+              >
+                Need help getting your container?
+                <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+              </a>
+            </motion.div>
           </header>
         ) : (
           <header className="flex flex-col md:flex-row md:items-end justify-between gap-8">
@@ -135,7 +150,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="py-12"
+              className="py-12 flex flex-col items-center gap-12"
             >
               {isProcessing ? (
                 <div className="flex flex-col items-center justify-center py-20 space-y-6">
@@ -143,9 +158,12 @@ export default function Home() {
                   <p className="text-zinc-400 font-bold animate-pulse">Analyzing Container Structure...</p>
                 </div>
               ) : (
-                <div className="max-w-3xl mx-auto">
-                  <FileUpload onFileSelect={handleFileSelect} />
-                </div>
+                <>
+                  <div className="w-full max-w-3xl flex flex-col items-center">
+                    <FileUpload onFileSelect={handleFileSelect} />
+                  </div>
+                  <GTMExportGuide />
+                </>
               )}
             </motion.section>
           ) : (
@@ -193,14 +211,8 @@ export default function Home() {
         {/* Footer */}
         <footer className="pt-20 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-8">
           <p className="text-zinc-600 text-sm font-medium">
-            © {new Date().getFullYear()} AuditGTM. Technical health check for marketing containers.
+            © 2026 Sitelogic LLC. Technical health check for marketing containers.
           </p>
-          <div className="flex items-center gap-6 text-zinc-600">
-            <a href="#" className="hover:text-brand transition-colors flex items-center gap-2 text-sm font-bold">
-              <Github size={18} />
-              Open Source
-            </a>
-          </div>
         </footer>
       </div>
     </main>

@@ -80,11 +80,6 @@ export default function FileUpload({ onFileSelect }: FileUploadProps) {
                     Drag and drop your exported JSON file here, or click to browse.
                 </p>
 
-                <div className="mt-8 flex items-center gap-4 text-xs text-zinc-500 bg-black px-4 py-2 rounded-full border border-zinc-800">
-                    <span className="flex items-center gap-1"><FileJson size={14} /> Admin &gt; Export</span>
-                    <span>•</span>
-                    <span>Standard JSON format</span>
-                </div>
             </div>
 
             {error && (
