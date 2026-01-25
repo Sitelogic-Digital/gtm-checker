@@ -37,8 +37,13 @@ export default function IssuesList({ report }: IssuesListProps) {
                             <Sparkles className="text-white animate-pulse" size={20} />
                         </div>
                         <div>
-                            <h4 className="font-black text-white uppercase tracking-wider text-xs">AI Deep-Dive Guidance</h4>
-                            <p className="text-zinc-400 text-[11px] mt-0.5 font-medium">Activate expert GTM fix recommendations with your Gemini API Key.</p>
+                            <div className="flex items-center gap-2">
+                                <h4 className="font-black text-white uppercase tracking-wider text-xs">AI Deep-Dive Guidance</h4>
+                                <span className="bg-brand/20 text-brand text-[8px] font-black px-1.5 py-0.5 rounded-md border border-brand/30">BETA</span>
+                            </div>
+                            <p className="text-zinc-400 text-[11px] mt-0.5 font-medium pr-12">
+                                This is a beta feature. Please bring your own Gemini API Key to enable expert GTM fix recommendations.
+                            </p>
                         </div>
                     </div>
                     <button
