@@ -4,7 +4,7 @@ import { AREAS, type Area, type IssueGroup, type Severity } from '@gtm-audit/cor
 import { useEffect, useMemo, useState } from 'react';
 import type { AuditBundle } from '../lib/audit';
 import { Highlight } from './Highlight';
-import { ConfidenceMark, EmptyState, ExpandButton, FilterChips, plural, SeverityBadge, useExpanded } from './ui';
+import { ConfidenceMark, distinctTexts, EmptyState, ExpandButton, FilterChips, plural, SeverityBadge, useExpanded } from './ui';
 
 type SevFilter = 'all' | Severity;
 type AreaFilter = 'all' | Area;
@@ -98,7 +98,7 @@ function Issue({ issue, open, onToggle }: { issue: IssueGroup; open: boolean; on
   const id = `issue-${issue.ruleId}-${issue.severity}`;
   const first = issue.findings[0]!;
   // Most findings in a group share the rule's text; show per-finding fixes only when they differ.
-  const fixes = [...new Set(issue.findings.map((f) => f.fix))];
+  const fixes = distinctTexts(issue.findings.map((f) => f.fix));
   const wheres = [...new Map(issue.findings.map((f) => [f.where.path, f.where])).values()];
   return (
     <article id={id} className="panel issue" aria-labelledby={`${id}-t`}>
@@ -108,7 +108,6 @@ function Issue({ issue, open, onToggle }: { issue: IssueGroup; open: boolean; on
           <h3 id={`${id}-t`} className="issue-title">{issue.title}</h3>
           <div className="issue-sub">
             <SeverityBadge severity={issue.severity} />
-            <span className="mono subtle" style={{ fontSize: 12 }}>{issue.ruleId}</span>
             <span className="subtle" style={{ fontSize: 14 }}>{plural(issue.findings.length, 'item')}</span>
             <ConfidenceMark confidence={issue.confidence} />
           </div>

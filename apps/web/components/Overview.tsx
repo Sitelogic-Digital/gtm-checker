@@ -44,7 +44,7 @@ export function Overview({ b }: { b: AuditBundle }) {
             const panelId = `score-${s.area}`;
             return (
               <div key={s.area} className="score">
-                <span className="label">{s.label}</span>
+                <span className="label-caps">{s.label}</span>
                 <span className="score-value">
                   {s.score}
                   <small>/ 100</small>
@@ -58,7 +58,7 @@ export function Overview({ b }: { b: AuditBundle }) {
                       {s.deductions.map((d) => (
                         <li key={d.ruleId}>
                           <span>
-                            <a href={`#risks/${d.ruleId}`}>{d.ruleId}</a> {d.title}
+                            <a href={`#risks/${d.ruleId}`}>{d.title}</a>
                             {d.findings > 1 ? ` (${d.findings})` : ''}
                           </span>
                           <span className="pts">−{d.points}</span>
@@ -87,7 +87,6 @@ export function Overview({ b }: { b: AuditBundle }) {
                   <span>
                     <span style={{ fontWeight: 500 }}>{i.title}</span>
                     <span className="row" style={{ marginTop: 4 }}>
-                      <span className="mono subtle" style={{ fontSize: 12 }}>{i.ruleId}</span>
                       <span className="subtle" style={{ fontSize: 14 }}>{plural(i.findings.length, 'item')}</span>
                       <ConfidenceMark confidence={i.confidence} />
                     </span>

@@ -10,11 +10,10 @@ export function Upload({ onFile, error, busy }: { onFile: (f: File) => void; err
   return (
     <main id="main" className="wrap page-enter">
       <div className="hero stack">
-        <p className="kicker">GTM container audit</p>
-        <h1 className="display-page">Find what will break your data first.</h1>
+        <h1 className="display-page">Get your Google Tag Manager into shape.</h1>
         <p className="lead">
-          Drop in a GTM container export. You&rsquo;ll get a plain-English read of what&rsquo;s inside, a map of every GA4 event and
-          parameter, and the problems worth fixing, most serious first.
+          Drop in your GTM container. You&rsquo;ll get an overview of what&rsquo;s inside, a map of every GA4 event and
+          parameter, and a prioritized list of what might need to be fixed.
         </p>
       </div>
 
@@ -34,8 +33,8 @@ export function Upload({ onFile, error, busy }: { onFile: (f: File) => void; err
             if (f) onFile(f);
           }}
         >
-          <span className="label">Container export (.json)</span>
-          <span className="drop-title">{busy ? 'Reading the container…' : 'Drop the file here, or choose it'}</span>
+          <span className="label-caps">Container export (.json)</span>
+          <span className="drop-title">{busy ? 'Reading the container…' : 'Drop the file here, or click to browse'}</span>
           <span className="muted" style={{ fontSize: 15 }}>
             Not sure where to find it? The steps are alongside.
           </span>

@@ -170,7 +170,7 @@ function EventsTable({ b }: { b: AuditBundle }) {
                       {r.findings.length ? (
                         <span className="row" style={{ gap: 8 }}>
                           <SeverityBadge severity={(['critical', 'warning', 'housekeeping', 'info'] as const)[Math.min(r.worst, 3)]!} />
-                          {r.findings.length > 1 && <span className="mono subtle" style={{ fontSize: 12 }}>×{r.findings.length}</span>}
+                          {r.findings.length > 1 && <span className="subtle">×{r.findings.length}</span>}
                         </span>
                       ) : (
                         <span className="subtle">–</span>
@@ -366,7 +366,7 @@ function ParamsTable({ b }: { b: AuditBundle }) {
                   {r.flagged && <> <a href="#risks/GA4-09" className="sev sev-warning" style={{ marginLeft: 8, textDecoration: 'none' }}>Spelling</a></>}
                 </td>
                 <td>
-                  <span className="mono" style={{ fontSize: 13 }}>{r.events.slice(0, 4).join(', ')}</span>
+                  <span className="mono">{r.events.slice(0, 4).join(', ')}</span>
                   {r.events.length > 4 && <span className="subtle"> and {r.events.length - 4} more</span>}
                 </td>
                 <td>{r.sources.join('; ')}</td>

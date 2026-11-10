@@ -135,3 +135,13 @@ export function FindingList({ findings }: { findings: Finding[] }) {
 export function plural(n: number, one: string, many = `${one}s`) {
   return `${n} ${n === 1 ? one : many}`;
 }
+
+/** Text with names and details in quotes or brackets blanked, to spot sentences that only differ by name. */
+export const sentenceShape = (t: string) => t.replace(/"[^"]*"|“[^”]*”|\([^)]*\)/g, '…');
+
+/** Distinct texts, treating sentences that only differ by a quoted name or example as the same (keeps the first). */
+export function distinctTexts(texts: string[]): string[] {
+  const seen = new Map<string, string>();
+  for (const t of texts) if (!seen.has(sentenceShape(t))) seen.set(sentenceShape(t), t);
+  return [...seen.values()];
+}

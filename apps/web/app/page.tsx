@@ -9,6 +9,7 @@
 import type { ImportError } from '@gtm-audit/core';
 import { useCallback, useEffect, useState } from 'react';
 import { EventMap } from '../components/EventMap';
+import { Report } from '../components/Report';
 import { Overview } from '../components/Overview';
 import { Risks } from '../components/Risks';
 import { Triggers } from '../components/Triggers';
@@ -104,12 +105,18 @@ export default function Page() {
       </AppHeader>
       <main id="main" className="wrap page-enter" key={route.view} style={{ paddingTop: 'var(--space-12)', paddingBottom: 'var(--space-24)' }}>
         <div className="stack-lg">
+          <div className="view-head">
           <div className="stack-sm">
             <p className="eyebrow">
-              {m.meta.containerName && m.meta.containerName !== m.meta.publicId ? `${m.meta.containerName} · ` : ''}
+              {m.meta.containerName && m.meta.containerName !== m.meta.publicId ? `${m.meta.containerName}: ` : ''}
               {m.meta.publicId}
             </p>
             <h1 id="view-title" tabIndex={-1} className="h2" style={{ outline: 'none' }}>{current.title}</h1>
+          </div>
+          <button type="button" className="sl-btn sl-btn-sm" onClick={() => window.print()}>
+            <span>Download PDF</span>
+            <span className="sl-arrow sl-arrow-down" aria-hidden="true">↓</span>
+          </button>
           </div>
           {route.view === 'overview' && <Overview b={bundle} />}
           {route.view === 'events' && <EventMap b={bundle} />}
@@ -130,6 +137,7 @@ export default function Page() {
           </footer>
         </div>
       </main>
+      <Report b={bundle} />
     </>
   );
 }
@@ -141,7 +149,7 @@ function AppHeader({ children }: { children?: React.ReactNode }) {
       <div className="wrap app-head-inner">
         <span className="brand">
           <img className="brand-mark" src="/brand/sitelogic-icon.svg" alt="Sitelogic" width={28} height={28} />
-          <span className="label">GTM Auditor</span>
+          <span className="label-caps">GTM Auditor</span>
         </span>
         {children}
         <ThemeToggle />

@@ -59,8 +59,10 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 .spread { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-6); flex-wrap: wrap; }
 .muted { color: var(--fg-muted); }
 .subtle { color: var(--fg-subtle); }
-.label { font-family: var(--font-mono); font-size: 12px; line-height: 1.33; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-label); font-weight: 400; }
+.label { font-family: var(--font-sans); font-size: 13px; line-height: 1.4; letter-spacing: 0; color: var(--fg-label); font-weight: 500; }
 .eyebrow { font-family: var(--font-mono); font-size: 14px; line-height: 1.43; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mark); font-weight: 500; }
+/* Mono caps: an accent for the few labels that head a block (score areas, upload box, report cover). Not for table headers, badges or inline labels. */
+.label-caps { font-family: var(--font-mono); font-size: 12px; line-height: 1.33; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-label); font-weight: 400; }
 .panel { border: 1px solid var(--border); border-radius: 0 var(--radius-2xl); background: var(--surface); }
 .panel-pad { padding: var(--space-8); }
 @media (max-width: 767px) { .panel-pad { padding: var(--space-6); } }
@@ -90,17 +92,17 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 .nav a[aria-current="page"], .tab[aria-selected="true"] { color: var(--fg); }
 .nav a[aria-current="page"]::after, .tab[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--mark); }
 .nav a:focus-visible, .tab:focus-visible { outline-offset: -2px; }
-.nav .count { margin-left: var(--space-2); color: var(--fg-subtle); font-family: var(--font-mono); font-size: 12px; }
+.nav .count { margin-left: var(--space-2); color: var(--fg-subtle); font-size: 13px; font-variant-numeric: tabular-nums; }
 .tabs { display: flex; gap: var(--space-8); border-bottom: 1px solid var(--border); }
 
 /* ---------- Severity and confidence ---------- */
-.sev { display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 12px; line-height: 1; letter-spacing: 0.18em; text-transform: uppercase; white-space: nowrap; }
+.sev { display: inline-flex; align-items: center; font-family: var(--font-sans); font-size: 13px; line-height: 1; font-weight: 500; white-space: nowrap; }
 /* Ink on citrus is ~6.8:1. White on citrus (3.1:1) fails AA for text, so the label is ink. */
 .sev-critical { background: var(--citrus); color: var(--ink); padding: 5px 10px; border-radius: var(--radius-pill); font-weight: 500; }
 .sev-warning { border: 1px solid var(--border-control); color: var(--fg); padding: 4px 10px; border-radius: var(--radius-pill); }
 .sev-housekeeping { color: var(--fg-subtle); }
 .sev-info { color: var(--fg-subtle); }
-.conf { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-label); white-space: nowrap; }
+.conf { font-family: var(--font-sans); font-size: 13px; color: var(--fg-label); white-space: nowrap; }
 .conf-preview { color: var(--fg-body); }
 
 /* ---------- Filter chips ---------- */
@@ -112,7 +114,7 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 }
 .chip:hover { border-color: var(--fg); color: var(--fg); }
 .chip[aria-pressed="true"] { border-color: var(--mark); color: var(--fg); }
-.chip .n { font-family: var(--font-mono); font-size: 12px; color: var(--fg-subtle); }
+.chip .n { font-size: 13px; color: var(--fg-subtle); font-variant-numeric: tabular-nums; }
 
 /* ---------- Search field (TextField, compact) ---------- */
 .search { min-width: 260px; flex: 1; max-width: 420px; }
@@ -123,15 +125,19 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 .table-wrap:focus-visible { outline-offset: 2px; }
 .table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; line-height: 1.55; }
 .table th { position: sticky; top: 0; z-index: 1; background: var(--surface); text-align: left; vertical-align: bottom; padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border-strong); }
-.table th, .table th button { font-family: var(--font-mono); font-size: 12px; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-label); }
+.table th, .table th button { font-family: var(--font-sans); font-size: 15px; font-weight: 500; letter-spacing: 0; color: var(--fg-label); }
 .table th button { background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; gap: var(--space-1); align-items: center; }
 .table th button:hover { color: var(--fg); }
 .table th[aria-sort] button { color: var(--fg); }
 .table td { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); vertical-align: top; color: var(--fg-body); }
 .table tbody tr.main:hover > td { background: var(--surface-hover); }
 .table tr:last-child > td { border-bottom: 0; }
-.table td.mono, .table .mono { font-family: var(--font-mono); font-size: 13px; color: var(--fg); }
-.table td.num { font-family: var(--font-mono); font-size: 13px; text-align: right; white-space: nowrap; }
+.table td.mono, .table .mono { font-family: var(--font-mono); font-size: 14px; color: var(--fg); }
+/* Tables use one text size: 15px sans, 14px mono (optically the same). Labels, badges and chips inside cells follow it. */
+.table td .label, .table td .conf, .table td .sev, .table td .subtle { font-size: 15px; }
+.table td .label { font-weight: 400; }
+.table .hl { font-size: 14px; }
+.table td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 .table th.num { text-align: right; }
 .table .detail > td { background: var(--surface-raised); padding: var(--space-6); }
 /* Bone: surface and raised are both white, so expanded detail sits inset on the page colour instead. */
@@ -149,7 +155,7 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 .expand[aria-expanded="true"] { transform: rotate(45deg); border-color: var(--mark); color: var(--mark); }
 
 /* Row headers: the first data cell, marked up as th scope="row" for screen readers. */
-.table tbody th.rowhead { position: static; z-index: auto; background: transparent; border-bottom: 1px solid var(--border); vertical-align: top; padding: var(--space-3) var(--space-4); font-family: var(--font-mono); font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--fg); font-weight: 400; }
+.table tbody th.rowhead { position: static; z-index: auto; background: transparent; border-bottom: 1px solid var(--border); vertical-align: top; padding: var(--space-3) var(--space-4); font-family: var(--font-mono); font-size: 14px; letter-spacing: 0; text-transform: none; color: var(--fg); font-weight: 400; }
 .table tbody tr:last-child > th.rowhead { border-bottom: 0; }
 .table tbody tr.main:hover > th.rowhead { background: var(--surface-hover); }
 
@@ -167,7 +173,7 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 .disclosure:hover { color: var(--mark); border-color: var(--mark); }
 .deductions { margin: var(--space-2) 0 0; padding: 0; list-style: none; font-size: 13px; line-height: 1.5; }
 .deductions li { display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-1) 0; border-top: 1px solid var(--border); }
-.deductions .pts { font-family: var(--font-mono); color: var(--fg); white-space: nowrap; }
+.deductions .pts { font-variant-numeric: tabular-nums; font-weight: 500; color: var(--fg); white-space: nowrap; }
 
 /* ---------- Issues ---------- */
 .issue + .issue { margin-top: var(--space-4); }
@@ -177,7 +183,7 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 .issue-body { border-top: 1px solid var(--border); padding: var(--space-6); }
 .issue-body .facts { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .issue-body h4 { font-size: 14px; }
-.where-path { font-family: var(--font-mono); font-size: 13px; color: var(--fg); }
+.where-path { font-weight: 500; color: var(--fg); }
 
 .top-issues { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: 0 var(--radius-2xl); }
 .top-issues li + li { border-top: 1px solid var(--border); }
@@ -185,13 +191,14 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 .top-issues a:hover { background: var(--surface-hover); }
 .top-issues a:focus-visible { outline-offset: -2px; }
 .top-issues .arrow { color: var(--mark); }
+.top-issues .sev { justify-self: start; }
 @media (max-width: 767px) { .top-issues a { grid-template-columns: 1fr; gap: var(--space-2); } }
 
 /* ---------- Upload ---------- */
 .hero { padding: var(--space-20) 0 var(--space-12); }
 @media (min-width: 768px) { .hero { padding: var(--space-28) 0 var(--space-16); } }
 .display-page { font-size: clamp(48px, 7vw, 100px); line-height: 0.9; font-weight: 300; letter-spacing: -0.04em; color: var(--fg-display); max-width: 16ch; text-wrap: balance; }
-.kicker { font-family: var(--font-mono); font-size: 14px; line-height: 1; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mark); }
+.kicker { font-family: var(--font-sans); font-size: 15px; line-height: 1; font-weight: 500; color: var(--mark); }
 @media (min-width: 768px) { .kicker { font-size: 16px; } }
 .lead { font-size: 20px; line-height: 1.375; font-weight: 300; color: var(--fg-muted); max-width: 40rem; }
 .drop {
@@ -232,7 +239,7 @@ code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
 /* Export how-to */
 .howto { counter-reset: step; list-style: none; margin: 0; padding: 0; }
 .howto > li { counter-increment: step; display: grid; grid-template-columns: 40px 1fr; gap: var(--space-3); padding: var(--space-4) 0; border-top: 1px solid var(--border); }
-.howto > li::before { content: counter(step, decimal-leading-zero); font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.08em; color: var(--mark); padding-top: 2px; }
+.howto > li::before { content: counter(step); font-family: var(--font-sans); font-size: 15px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--mark); padding-top: 2px; }
 .howto strong { color: var(--fg); font-weight: 500; }
 .upload-grid { display: grid; gap: var(--space-12); grid-template-columns: 1fr; padding-bottom: var(--space-24); }
 @media (min-width: 1024px) { .upload-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
@@ -244,3 +251,61 @@ section > h2, .h3 { font-size: 24px; line-height: 1.25; font-weight: 500; }
 .sentences p + p { margin-top: var(--space-2); }
 .sentences { font-size: 20px; line-height: 1.5; color: var(--fg-body); max-width: 52rem; }
 .sentences strong { color: var(--fg); font-weight: 500; }
+
+/* ---------- View head: title plus the Save as PDF action ---------- */
+.view-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+
+/* Design-system button with the arrow badge pointing down (downloads): the badge fills on hover but stays put. */
+a:hover > .sl-arrow-down, button:hover > .sl-arrow-down { transform: none; }
+
+/* Mono is for code values only (event names, IDs, {{variables}}); the design system's field label is mono caps, so the app sets it like .label. */
+.sl-field-label { font-family: var(--font-sans); font-size: 13px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--fg-label); }
+
+/* ---------- Printable report (components/Report.tsx) ---------- */
+/* Hidden on screen. Printing hides the app and shows the report, always in Bone (data-theme on .report). */
+.report { display: none; }
+@media print {
+  @page { margin: 16mm 14mm; }
+  html, body { background: var(--white); }
+  body { font-size: 11pt; line-height: 1.5; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .skip, .app-head, main, nextjs-portal { display: none !important; }
+  .report { display: block; color: var(--fg-body); }
+  .report .label { font-size: 9pt; }
+  .report .label-caps { font-size: 7.5pt; }
+  .report p { margin: 0 0 var(--space-2); }
+  .report-cover { padding-bottom: var(--space-6); border-bottom: 1px solid var(--border-strong); margin-bottom: var(--space-6); }
+  .report-brand { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-6); }
+  .report-title { font-size: 26pt; font-weight: 300; letter-spacing: -0.02em; line-height: 1.1; color: var(--fg); margin: 0 0 var(--space-4); }
+  .report-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-6); margin: 0; }
+  .report-meta dt { margin: 0 0 2px; }
+  .report-meta dd { margin: 0; color: var(--fg); }
+  .report-section { margin-bottom: var(--space-8); }
+  .report-h2 { font-size: 15pt; font-weight: 500; color: var(--fg); margin: 0 0 var(--space-3); break-after: avoid; }
+  .report-h3 { font-size: 12pt; font-weight: 500; color: var(--fg); margin: 0 0 var(--space-2); }
+  .report-note { font-size: 9pt; color: var(--fg-muted); }
+  .report-sentences p { font-size: 11.5pt; }
+  .report-scores { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-3); margin-bottom: var(--space-3); }
+  .report-score { border: 1px solid var(--border); border-radius: 0 var(--radius-md); padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
+  .report-score-value { font-size: 22pt; font-weight: 300; color: var(--fg); line-height: 1; }
+  .report-score-value small { font-size: 9pt; color: var(--fg-muted); }
+  .report-issue { border-top: 1px solid var(--border); padding-top: var(--space-4); margin-top: var(--space-4); }
+  .report-issue-head { break-after: avoid; break-inside: avoid; margin-bottom: var(--space-3); }
+  .report-issue .issue-sub { font-size: 9pt; }
+  .report-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); margin-bottom: var(--space-3); break-inside: avoid; }
+  .report-facts h4, .report-issue > h4 { margin: 0 0 var(--space-1); }
+  .report-where { font-size: 9pt; color: var(--fg); }
+  .report-affected { margin: 0; padding-left: 1.1em; font-size: 9.5pt; }
+  .report-affected li { margin-bottom: 3px; break-inside: avoid; }
+  .report-affected-names { columns: 2; column-gap: var(--space-6); }
+  .report-entity { font-weight: 500; color: var(--fg); }
+  .report .hl { font-size: 0.85em; white-space: normal; }
+  .report-appendix { break-before: page; }
+  .report-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+  .report-table th { text-align: left; font-size: 8.5pt; font-weight: 500; color: var(--fg-label); border-bottom: 1px solid var(--border-strong); padding: var(--space-1) var(--space-2); }
+  .report-table td { border-bottom: 1px solid var(--border); padding: var(--space-1) var(--space-2); vertical-align: top; }
+  .report-table tr { break-inside: avoid; }
+  .report-table thead { display: table-header-group; }
+  .report-table .num { text-align: right; }
+  .report-foot { margin-top: var(--space-10); padding-top: var(--space-3); border-top: 1px solid var(--border); font-size: 8.5pt; color: var(--fg-muted); }
+}
