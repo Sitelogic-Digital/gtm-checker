@@ -4,7 +4,7 @@ import type { Confidence, Finding, Severity } from '@gtm-audit/core';
 import { useId, useMemo, useState, type ReactNode } from 'react';
 import { Highlight } from './Highlight';
 
-const SEV_LABEL: Record<Severity, string> = { critical: 'Critical', warning: 'Warning', housekeeping: 'Housekeeping', info: 'Info' };
+export const SEV_LABEL: Record<Severity, string> = { critical: 'Critical', warning: 'Warning', housekeeping: 'Housekeeping', info: 'Info' };
 
 /** The word is always present, so severity never depends on colour alone. Info renders nothing. */
 export function SeverityBadge({ severity }: { severity: Severity }) {

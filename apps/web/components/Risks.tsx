@@ -9,7 +9,7 @@ import { ConfidenceMark, distinctTexts, EmptyState, ExpandButton, FilterChips, p
 type SevFilter = 'all' | Severity;
 type AreaFilter = 'all' | Area;
 
-const KIND_LABEL: Record<string, string> = {
+export const KIND_LABEL: Record<string, string> = {
   tag: 'Tag',
   trigger: 'Trigger',
   variable: 'Variable',

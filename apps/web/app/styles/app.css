@@ -277,6 +277,26 @@ a:hover > .sl-arrow-down, button:hover > .sl-arrow-down { transform: none; }
 /* Mono is for code values only (event names, IDs, {{variables}}); the design system's field label is mono caps, so the app sets it like .label. */
 .sl-field-label { font-family: var(--font-sans); font-size: 13px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--fg-label); }
 
+/* ---------- Download menu (components/DownloadMenu.tsx) ---------- */
+.download { position: relative; }
+.download-list {
+  position: absolute; right: 0; top: calc(100% + var(--space-2)); z-index: 30; min-width: 330px; margin: 0; padding: var(--space-2) 0; list-style: none;
+  background: var(--surface-raised); border: 1px solid var(--border-strong); border-radius: 0 var(--radius-2xl);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--ink) 14%, transparent);
+}
+.download-list[hidden] { display: none; }
+.download-list button {
+  display: flex; flex-direction: column; gap: 2px; width: 100%; padding: var(--space-3) var(--space-5); text-align: left;
+  background: none; border: 0; color: var(--fg); font: inherit; cursor: pointer;
+}
+.download-list button:hover:not(:disabled) { background: var(--surface-hover); }
+.download-list button:focus-visible { outline: 2px solid var(--mark); outline-offset: -2px; }
+.download-list button:disabled { cursor: not-allowed; }
+.download-list button:disabled .download-name { color: var(--fg-muted); }
+.download-name { font-size: 15px; font-weight: 500; }
+.download-meta { font-size: 13px; color: var(--fg-muted); }
+@media (max-width: 767px) { .download-list { left: 0; right: auto; min-width: min(300px, calc(100vw - 32px)); } }
+
 /* ---------- Printable report (components/Report.tsx) ---------- */
 /* Hidden on screen. Printing hides the app and shows the report, always in Bone (data-theme on .report). */
 .report { display: none; }

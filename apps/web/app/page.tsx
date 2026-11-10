@@ -8,6 +8,7 @@
  */
 import type { ImportError } from '@gtm-audit/core';
 import { useCallback, useEffect, useState } from 'react';
+import { DownloadMenu } from '../components/DownloadMenu';
 import { EventMap } from '../components/EventMap';
 import { Report } from '../components/Report';
 import { Overview } from '../components/Overview';
@@ -113,10 +114,7 @@ export default function Page() {
             </p>
             <h1 id="view-title" tabIndex={-1} className="h2" style={{ outline: 'none' }}>{current.title}</h1>
           </div>
-          <button type="button" className="sl-btn sl-btn-sm" onClick={() => window.print()}>
-            <span>Download PDF</span>
-            <span className="sl-arrow sl-arrow-down" aria-hidden="true">↓</span>
-          </button>
+          <DownloadMenu b={bundle} />
           </div>
           {route.view === 'overview' && <Overview b={bundle} />}
           {route.view === 'events' && <EventMap b={bundle} />}

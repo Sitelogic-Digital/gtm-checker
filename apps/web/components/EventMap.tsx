@@ -23,7 +23,7 @@ const SOURCE_LABEL: Record<ParamSource['kind'], string> = {
   missing: 'Missing',
 };
 
-const ORIGIN_LABEL: Record<Ga4Param['origin'], string> = {
+export const ORIGIN_LABEL: Record<Ga4Param['origin'], string> = {
   tag: 'Tag',
   'event-settings-variable': 'Shared Event Settings',
   'google-tag-shared': 'Google tag',
