@@ -1,0 +1,17 @@
+export * from './model';
+export type * from './raw-types';
+export { parseContainer, type ParseOutcome } from './parse';
+export { validateExport, type ImportError, type ImportErrorCode } from './validate';
+export { buildGraph, type EntityGraph, type EntityRef, type UsageRef } from './graph';
+export { extractGa4Events, classifySource, type Ga4Event, type Ga4Send, type Ga4Param, type ParamSource } from './ga4';
+export { detectState } from './state';
+export { GA4_LIMITS } from './config/ga4-limits';
+export { TAG_TYPES, TRIGGER_TYPES, VARIABLE_TYPES, BUILT_IN_TRIGGERS } from './catalog/types';
+export * as gtm2026 from './catalog/gtm-2026';
+export { summarise, type ContainerSummary } from './summary';
+export { audit, runRules, fingerprintOf, STARTER_RULES, SEVERITY_ORDER } from './rules';
+export type * from './rules/types';
+export { GA4_RESERVED } from './config/ga4-reserved';
+export { triggerSentence, conditionPhrase, varLabel } from './describe/trigger-sentence';
+export { healthScores, AREAS, DEDUCTION, SCORE_METHOD, type AreaScore } from './describe/score';
+export { overviewSentences } from './describe/overview';

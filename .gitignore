@@ -1,0 +1,19 @@
+node_modules/
+.next/
+dist/
+.turbo/
+.env*
+!.env.example
+.DS_Store
+*.tsbuildinfo
+
+# Real client container exports are confidential. Never commit them.
+# Only sanitised copies go in packages/core/test/fixtures.
+fixtures/private/*
+!fixtures/private/README.md
+
+# Generated from design/ by design/build-tokens.mjs (runs before dev and build)
+apps/web/app/styles/tokens.css
+apps/web/app/styles/sitelogic-components.css
+apps/web/public/fonts/
+apps/web/public/brand/

@@ -1,0 +1,6 @@
+{
+  "name": "@gtm-audit/rulesets",
+  "version": "0.0.0",
+  "private": true,
+  "files": ["*.json"]
+}

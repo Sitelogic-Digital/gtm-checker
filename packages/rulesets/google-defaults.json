@@ -1,0 +1,6 @@
+{
+  "id": "google-defaults",
+  "title": "Google defaults",
+  "description": "GA4 and GTM checks only. No house naming or folder conventions.",
+  "rules": []
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@gtm-audit/web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "tokens": "node ../../design/build-tokens.mjs",
+    "predev": "node ../../design/build-tokens.mjs",
+    "dev": "next dev",
+    "prebuild": "node ../../design/build-tokens.mjs",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gtm-audit/core": "workspace:*",
+    "next": "^15.5.29",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^5.9.3"
+  }
+}
