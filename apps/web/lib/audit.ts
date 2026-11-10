@@ -3,7 +3,8 @@ import {
   buildGraph,
   extractGa4Events,
   healthScores,
-  overviewSentences,
+  unusedAreas,
+  overviewParts,
   parseContainer,
   type AreaScore,
   type AuditResult,
@@ -12,6 +13,7 @@ import {
   type Finding,
   type Ga4Event,
   type ImportError,
+  type Sentence,
 } from '@gtm-audit/core';
 
 /** Everything the views need, computed once per file, in the browser. Nothing is sent anywhere. */
@@ -22,7 +24,8 @@ export interface AuditBundle {
   events: Ga4Event[];
   result: AuditResult;
   scores: AreaScore[];
-  overview: string[];
+  /** The Overview summary as marked-up sentences (highlighted facts, some linked). */
+  overview: Sentence[];
   /** Findings keyed by the entity they point at, for "findings on this row". */
   findingsByEntity: Map<string, Finding[]>;
 }
@@ -52,8 +55,8 @@ export function buildAudit(fileName: string, text: string): { ok: true; bundle: 
       graph,
       events,
       result,
-      scores: healthScores(result),
-      overview: overviewSentences(model, graph, events, result),
+      scores: healthScores(result, unusedAreas(model.tags.map((t) => t.type.key))),
+      overview: overviewParts(model, graph, events, result),
       findingsByEntity,
     },
   };

@@ -13,13 +13,15 @@ import { constant, container, dataLayerVar, ga4Event, googleTag, run, settings, 
 
 const many = (n: number, prefix = 'p') => Object.fromEntries(Array.from({ length: n }, (_, i) => [`${prefix}_${i}`, 'x']));
 
-describe('GA4-01 event name GA4 will reject', () => {
+describe('GA4-01 event name that breaks the naming rules', () => {
   it('fires on names that are too long, start badly or contain spaces', () => {
     const f = run(GA4_01, container({ tags: [ga4Event('Lead Form Submitted From The Contact Page Footer'), ga4Event('1st_click')] }));
     expect(f).toHaveLength(2);
     expect(f.find((x) => x.detail.eventName === '1st_click')!.message).toMatch(/starts with something other than a letter/);
     expect(f.find((x) => x.detail.eventName !== '1st_click')!.message).toMatch(/characters long.*spaces/);
-    expect(f.map((x) => x.severity)).toEqual(['critical', 'critical']);
+    // Over the length limit is a documented failure; a bad first character only breaks the naming rules.
+    expect(f.find((x) => x.detail.eventName === '1st_click')!.severity).toBe('warning');
+    expect(f.find((x) => x.detail.eventName !== '1st_click')!.severity).toBe('critical');
   });
   it('stays quiet on valid, dynamic and paused names', () => {
     const f = run(GA4_01, container({ tags: [ga4Event('generate_lead'), ga4Event('{{Event}}'), ga4Event('bad name', {}, { paused: true })] }));
@@ -39,12 +41,14 @@ describe('GA4-02 more than 25 parameters', () => {
   });
 });
 
-describe('GA4-03 parameter or user property name GA4 will reject', () => {
+describe('GA4-03 parameter or user property name that breaks the rules', () => {
   it('fires on hyphens, reserved prefixes and long user property names', () => {
     const f = run(GA4_03, container({
       tags: [ga4Event('e', { 'form-name': 'x', ga_custom: 'y' }, { userProperties: { customer_lifetime_value_tier: 'z' } })],
     }));
     expect(f.map((x) => x.detail.name).sort()).toEqual(['customer_lifetime_value_tier', 'form-name', 'ga_custom']);
+    const sev = Object.fromEntries(f.map((x) => [x.detail.name, x.severity]));
+    expect(sev).toEqual({ customer_lifetime_value_tier: 'critical', ga_custom: 'critical', 'form-name': 'warning' });
   });
   it('reports a bad name in a shared Event Settings variable once, against the variable', () => {
     const gtes = variable('gtes', 'GTES - Shared', [settings('eventSettingsTable', { 'bad name': 'x' })], '77');
@@ -105,6 +109,12 @@ describe('GA4-07 parameter that looks like personal data', () => {
   });
   it('stays quiet on non-personal names and flags such as email_domain', () => {
     expect(run(GA4_07, container({ tags: [ga4Event('e', { form_name: 'x', email_domain: 'y', has_email: 'z' })] }))).toEqual([]);
+  });
+  it('stays quiet for a phone parameter that records the clicked tel: link ({{Click URL}})', () => {
+    expect(run(GA4_07, container({ tags: [ga4Event('click_to_call', { Phone: '{{Click URL}}' })] }))).toEqual([]);
+  });
+  it('still flags a phone parameter fed from the data layer', () => {
+    expect(run(GA4_07, container({ tags: [ga4Event('lead', { phone: '{{DLV - phone}}' })] }))).toHaveLength(1);
   });
 });
 

@@ -18,9 +18,15 @@ function looksLikePii(s: string | undefined): boolean {
   return EXACT.has(n) || CONTAINS.some((c) => n.includes(c));
 }
 
+/**
+ * Built-in click variables hold the link or text on the site that was clicked. A "phone" parameter
+ * set to {{Click URL}} on a tel: link records the site's own number, not the visitor's.
+ */
+const SITE_CLICK_VALUE = /^\{\{\s*Click (URL|Text|ID|Classes|Element|Target)\s*\}\}$/i;
+
 /** Which part of the parameter looks personal: its name, the variable feeding it, or the data layer key. */
 function evidence(p: Ga4Param): string | undefined {
-  if (looksLikePii(p.name)) return `the name "${p.name}"`;
+  if (looksLikePii(p.name) && !SITE_CLICK_VALUE.test(p.value.trim())) return `the name "${p.name}"`;
   if (looksLikePii(p.source.detail)) return `its value, which comes from the data layer key "${p.source.detail}"`;
   if (looksLikePii(p.source.variableName)) return `its value, which comes from the variable {{${p.source.variableName}}}`;
   return undefined;

@@ -41,6 +41,13 @@ export const TRG_02: Rule = {
       ] as const;
       for (const [label, conds] of lists) {
         conds.forEach((c, i) => {
+          // ".*" on the event name of a Custom Event trigger means "any event": the standard way to build an
+          // exception trigger that checks a condition (such as a consent value) on every event. Not a mistake.
+          if (label === 'customEventFilter' && c.left.trim() === '{{_event}}' && !c.negate && MATCHES_EVERYTHING.test(c.right) && c.right !== '') return;
+          const matchAll = !c.negate && c.operator === 'MATCH_REGEX' && MATCHES_EVERYTHING.test(c.right) && c.right !== '';
+          // "Enable this trigger when" (timer, and click/form triggers that wait for tags) must have a condition;
+          // "Page URL matches .*" is the standard way to say "on every page". Not a mistake.
+          if (label === 'autoEventFilter' && matchAll) return;
           const problem = regexProblem(c);
           if (problem) {
             out.push({
@@ -48,6 +55,8 @@ export const TRG_02: Rule = {
               message: `This trigger ${problem}.`,
               detailKey: `${label}[${i}]:${c.right}`,
               detail: { condition: c },
+              // A condition that matches everything is pointless but harmless; only broken or never-true regex is Critical.
+              ...(matchAll ? { severity: 'housekeeping' as const, why: 'A condition that matches everything does nothing. It\'s harmless, but it makes the trigger look more selective than it is.', fix: 'Remove the condition, or change it to the pages or values you meant.' } : {}),
             });
           }
         });

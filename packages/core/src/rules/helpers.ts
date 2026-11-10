@@ -45,3 +45,11 @@ export const BUILT_IN_CONSENT = new Set(['googtag', 'gaawe', 'gaawc', 'awct', 's
 
 /** Page-load trigger types. INIT and CONSENT_INIT fire before page view, on every page. */
 export const PAGE_LOAD_TRIGGERS = new Set(['PAGEVIEW', 'DOM_READY', 'WINDOW_LOADED', 'INIT', 'CONSENT_INIT']);
+
+/** Trigger names or custom events that look like a consent platform's gate or update event. */
+export const CONSENT_TRIGGER = /consent|cookie|gdpr|ccpa|cmp|onetrust|cookiebot|usercentrics|optanon|marketing.?allowed|ad.?storage/i;
+
+/** True when a trigger's name or custom event name looks like a consent platform's gate or update. */
+export function isConsentTrigger(trg: { name: string; customEventFilters: Array<{ right: string }> }): boolean {
+  return CONSENT_TRIGGER.test(trg.name) || trg.customEventFilters.some((c) => CONSENT_TRIGGER.test(c.right));
+}

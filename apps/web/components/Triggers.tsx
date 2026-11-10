@@ -18,9 +18,12 @@ interface Row {
   findings: Finding[];
 }
 
-export function Triggers({ b }: { b: AuditBundle }) {
+const FILTERS: readonly Filter[] = ['all', 'used', 'unused', 'findings'];
+
+/** `initialFilter` comes from the URL (#triggers/unused), e.g. a link in the Overview summary. */
+export function Triggers({ b, initialFilter }: { b: AuditBundle; initialFilter?: string }) {
   const [q, setQ] = useState('');
-  const [filter, setFilter] = useState<Filter>('all');
+  const [filter, setFilter] = useState<Filter>(FILTERS.includes(initialFilter as Filter) ? (initialFilter as Filter) : 'all');
   const unused = useMemo(() => new Set(b.graph.unusedTriggerIds), [b]);
 
   const rows = useMemo<Row[]>(

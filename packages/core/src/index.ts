@@ -13,5 +13,5 @@ export { audit, runRules, fingerprintOf, STARTER_RULES, SEVERITY_ORDER } from '.
 export type * from './rules/types';
 export { GA4_RESERVED } from './config/ga4-reserved';
 export { triggerSentence, conditionPhrase, varLabel } from './describe/trigger-sentence';
-export { healthScores, AREAS, DEDUCTION, SCORE_METHOD, type AreaScore } from './describe/score';
-export { overviewSentences } from './describe/overview';
+export { healthScores, unusedAreas, AREAS, DEDUCTION, SCORE_METHOD, type AreaScore } from './describe/score';
+export { overviewParts, overviewSentences, sentenceText, type Sentence, type SentenceLink, type SentencePart } from './describe/overview';

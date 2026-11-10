@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { audit, buildGraph, extractGa4Events, healthScores, overviewSentences, parseContainer, triggerSentence } from '../src';
+import { audit, buildGraph, extractGa4Events, healthScores, unusedAreas, overviewParts, overviewSentences, parseContainer, triggerSentence } from '../src';
 import { cond, container, ga4Event, tag, trigger } from './builders';
 
 const load = (raw: ReturnType<typeof container>) => {
@@ -45,6 +45,25 @@ describe('overview sentences', () => {
     const s = overviewSentences(m, g, extractGa4Events(m, g), audit(m));
     expect(s[0]).toBe('This container sends 2 GA4 events to 2 measurement IDs, from 2 GA4 event tags.');
     expect(s.join(' ')).toMatch(/1 tag is paused/);
-    expect(s.join(' ')).toMatch(/1 critical issue, about consent/);
+    expect(s.join(' ')).toMatch(/1 critical issue, about consent, and no warnings\./);
+  });
+  it('marks key facts and links the ones with a view to open', () => {
+    const m = load(container({ tags: [ga4Event('a', {}, { mid: 'G-1' }), tag('img', { consent: 'NOT_SET' })], triggers: [trigger('CLICK', { id: '70' })] }));
+    const g = buildGraph(m);
+    const parts = overviewParts(m, g, extractGa4Events(m, g), audit(m)).flat().filter((p) => typeof p !== 'string');
+    const links = parts.flatMap((p) => (p.link ? [`${p.text} -> ${p.link.view}${p.link.sub ? `/${p.link.sub}` : ''}`] : []));
+    expect(links).toEqual(['1 GA4 event -> events', '1 trigger isn\'t used by anything -> triggers/unused', '1 critical issue -> risks']);
+  });
+});
+
+describe('scores for areas the container doesn\'t use', () => {
+  it('gives GA4 and Ads no score when there are no such tags, instead of a misleading 100', () => {
+    const m = load(container({ tags: [tag('ua'), tag('img', { consent: 'NOT_SET' })] }));
+    const scores = healthScores(audit(m), unusedAreas(m.tags.map((t) => t.type.key)));
+    expect(Object.fromEntries(scores.map((s) => [s.area, s.score]))).toMatchObject({ ga4: null, ads: null, consent: 70 });
+  });
+  it('scores GA4 normally when a GA4 tag is present', () => {
+    const m = load(container({ tags: [ga4Event('a')] }));
+    expect(healthScores(audit(m), unusedAreas(m.tags.map((t) => t.type.key))).find((s) => s.area === 'ga4')!.score).toBe(100);
   });
 });

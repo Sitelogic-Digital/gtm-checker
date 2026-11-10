@@ -4,6 +4,8 @@ import { RSK_02 } from '../src/rules/catalog/rsk-02-missing-conversion-linker';
 import { RSK_03 } from '../src/rules/catalog/rsk-03-linker-after-optimization';
 import { RSK_04 } from '../src/rules/catalog/rsk-04-custom-html';
 import { RSK_05 } from '../src/rules/catalog/rsk-05-template-permissions';
+import { RSK_09 } from '../src/rules/catalog/rsk-09-unused-template';
+import { RSK_10 } from '../src/rules/catalog/rsk-10-analytics-consent';
 import { RSK_06 } from '../src/rules/catalog/rsk-06-universal-analytics';
 import { RSK_07 } from '../src/rules/catalog/rsk-07-missing-variable';
 import { RSK_08 } from '../src/rules/catalog/rsk-08-consent-not-needed';
@@ -14,7 +16,7 @@ import { TRG_04 } from '../src/rules/catalog/trg-04-custom-event-casing';
 import { TRG_05 } from '../src/rules/catalog/trg-05-form-validation';
 import { TRG_06 } from '../src/rules/catalog/trg-06-unused-trigger';
 import { audit, parseContainer } from '../src';
-import { ALL_PAGES, cond, container, ga4Event, googleTag, run, tag, template, tpl, trigger, bool } from './builders';
+import { ALL_PAGES, cond, container, ga4Event, googleTag, run, tag, template, tpl, trigger, bool, variable } from './builders';
 
 describe('TRG-01 page_view sent more than once', () => {
   it('fires definitively when the Google tag and a page_view tag share a trigger', () => {
@@ -26,6 +28,15 @@ describe('TRG-01 page_view sent more than once', () => {
     const [f] = run(TRG_01, container({ tags: [googleTag('G-A'), googleTag('G-A', { id: '9', triggers: ['50'], config: { plan: 'x' } })], triggers: [ce] }));
     expect(f!.entity.id).toBe('9');
     expect(f!.message).toMatch(/fires on "CE - signup"/);
+  });
+  it('checks a Google tag whose ID comes from a variable (such as a lookup table)', () => {
+    const ce = trigger('CUSTOM_EVENT', { id: '53', name: 'CE - signup', customEvent: 'signup' });
+    const [f] = run(TRG_01, container({ tags: [googleTag('{{GA4 Lookup}}', { triggers: ['53'] })], triggers: [ce] }));
+    expect(f!.message).toMatch(/\{\{GA4 Lookup\}\}.*fires on "CE - signup"/);
+  });
+  it('stays quiet when the Google tag waits for a consent update event', () => {
+    const cu = trigger('CUSTOM_EVENT', { id: '54', name: 'GTM.ConsentUpdate', customEvent: 'cookie_consent_update' });
+    expect(run(TRG_01, container({ tags: [googleTag('{{GA4 Lookup}}', { triggers: ['54'] })], triggers: [cu] }))).toEqual([]);
   });
   it('fires when page_view is sent on History Change', () => {
     const hc = trigger('HISTORY_CHANGE', { id: '51' });
@@ -48,11 +59,21 @@ describe('TRG-02 broken or meaningless regex', () => {
       filters: [cond('MATCH_REGEX', '{{Page Path}}', '(unclosed'), cond('MATCH_REGEX', '{{Page URL}}', '.*'), cond('MATCH_REGEX', '{{Page Path}}', '^.*$', { negate: true })],
     });
     const f = run(TRG_02, container({ triggers: [t] }));
-    expect(f.map((x) => x.message)).toEqual([
-      expect.stringMatching(/won't compile/),
-      expect.stringMatching(/matches everything/),
-      expect.stringMatching(/never fires/),
-    ]);
+    const bySev = (re: RegExp) => f.find((x) => re.test(x.message))?.severity;
+    expect(f).toHaveLength(3);
+    expect(bySev(/won't compile/)).toBe('critical');
+    expect(bySev(/never fires/)).toBe('critical');
+    expect(bySev(/matches everything/)).toBe('housekeeping');
+  });
+  it('accepts ".*" in "Enable this trigger when", and treats ".*" in other conditions as housekeeping', () => {
+    const timer = { ...trigger('TIMER'), autoEventFilter: [cond('MATCH_REGEX', '{{Page URL}}', '.*')] };
+    expect(run(TRG_02, container({ triggers: [timer] }))).toEqual([]);
+    const [f] = run(TRG_02, container({ triggers: [trigger('PAGEVIEW', { filters: [cond('MATCH_REGEX', '{{Page URL}}', '.*')] })] }));
+    expect(f!.severity).toBe('housekeeping');
+  });
+  it('accepts ".*" on the event name of a Custom Event trigger (the "any event" exception-trigger pattern)', () => {
+    const t = { ...trigger('CUSTOM_EVENT', { filters: [cond('EQUALS', '{{DLV - ad_storage}}', 'denied')] }), customEventFilter: [cond('MATCH_REGEX', '{{_event}}', '.*')] };
+    expect(run(TRG_02, container({ triggers: [t] }))).toEqual([]);
   });
   it('accepts valid regex, including lookaheads (web containers run JavaScript regex)', () => {
     const t = trigger('PAGEVIEW', { filters: [cond('MATCH_REGEX', '{{Page Path}}', '^/thank-you'), cond('MATCH_REGEX', '{{Page Path}}', 'event(?!-auth)')] });
@@ -124,6 +145,32 @@ describe('RSK-01 marketing tag with consent not set', () => {
     const [f] = run(RSK_01, container({ triggers: [gate], tags: [tag('img', { consent: 'NOT_SET', triggers: ['90'] })] }));
     expect(f!.confidence).toBe('check-in-preview');
   });
+  it('judges template tags by what the template can do and who the vendor is', () => {
+    const f = run(RSK_01, container({
+      templates: [
+        template('20', 'Braze Initialization Tag', [{ id: 'inject_script' }]),
+        template('21', 'Braze Actions Tag', [{ id: 'access_globals' }, { id: 'read_data_layer' }]),
+        template('22', 'Contentsquare - Main tag', [{ id: 'inject_script' }]),
+        template('23', 'Acme Widget', [{ id: 'inject_script' }]),
+      ],
+      tags: ['20', '21', '21', '22', '23'].map((id) => tag(`cvt_2_${id}`, { consent: 'NOT_SET' })),
+    }));
+    // Braze init: known marketing vendor that loads code. Actions: can't load anything. Contentsquare: analytics. Acme: unknown, loads code.
+    expect(f.map((x) => [x.detail.reason, x.confidence])).toEqual([
+      ['Braze Initialization Tag', 'definite'],
+      ['Acme Widget, a template that loads third-party code', 'check-in-preview'],
+    ]);
+  });
+  it('is a Warning when a consent-looking blocking trigger holds the tag back', () => {
+    const block = { ...trigger('CUSTOM_EVENT', { id: '91', name: 'CE - cookie-update - Advertising Denied', filters: [cond('EQUALS', '{{DLV - ad_storage}}', 'denied')] }), customEventFilter: [cond('MATCH_REGEX', '{{_event}}', '.*')] };
+    const [f] = run(RSK_01, container({ triggers: [block], tags: [tag('img', { consent: 'NOT_SET', blocking: ['91'] })] }));
+    expect(f).toMatchObject({ severity: 'warning', confidence: 'check-in-preview' });
+    expect(f!.message).toMatch(/blocking trigger.*before the visitor has made a choice/);
+  });
+  it('recognises a StackAdapt pixel in Custom HTML', () => {
+    const html = tag('html', { consent: 'NOT_SET', params: [tpl('html', '<script>!function(s,a,e,v,n,t,z){}(window,document,"script","//tags.srv.stackadapt.com/events.js");saq("ts","abc");</script>')] });
+    expect(run(RSK_01, container({ tags: [html] }))).toHaveLength(1);
+  });
   it('ignores tags with built-in consent checks (Google, Microsoft UET), tags with consent set, and CMP templates', () => {
     const cmp = template('5', 'Cookiebot CMP', []);
     const f = run(RSK_01, container({
@@ -186,6 +233,7 @@ describe('RSK-05 template with broad permissions', () => {
 describe('RSK-06 Universal Analytics', () => {
   it('fires on UA tags, paused or not', () => {
     expect(run(RSK_06, container({ tags: [tag('ua', { paused: true })] }))).toHaveLength(1);
+    expect(run(RSK_06, container({ tags: [tag('opt')] }))[0]!.message).toMatch(/Google Optimize/);
   });
   it('stays quiet without UA', () => {
     expect(run(RSK_06, container({ tags: [ga4Event('x')] }))).toEqual([]);
@@ -206,7 +254,7 @@ describe('RSK-07 reference to a variable that does not exist', () => {
 });
 
 describe('RSK-08 marketing tag set to fire without consent', () => {
-  const pixel = template('9', 'Facebook Pixel', []);
+  const pixel = template('9', 'Facebook Pixel', [{ id: 'inject_script' }]);
   it('fires on a marketing template set to "No additional consent required"', () => {
     const [f] = run(RSK_08, container({ templates: [pixel], tags: [tag('cvt_2_9', { consent: 'NOT_NEEDED' })] }));
     expect(f).toMatchObject({ severity: 'warning', confidence: 'check-in-preview' });
@@ -228,5 +276,39 @@ describe('RSK-08 marketing tag set to fire without consent', () => {
   it('never tells the user what the law requires', () => {
     const text = [RSK_08.why, RSK_08.fix].join(' ');
     expect(text).not.toMatch(/\b(illegal|unlawful|breach|violat|non-?complian|GDPR requires|must comply)/i);
+  });
+});
+
+describe('RSK-09 custom template not used', () => {
+  it('fires for a template no tag or variable uses', () => {
+    const f = run(RSK_09, container({ templates: [template('5', 'Old Pixel', []), template('6', 'Live Pixel', [])], tags: [tag('cvt_2_6')] }));
+    expect(f).toHaveLength(1);
+    expect(f[0]!.entity).toMatchObject({ kind: 'template', id: '5', name: 'Old Pixel' });
+  });
+  it('stays quiet when every template is used by a tag or a variable', () => {
+    expect(run(RSK_09, container({ templates: [template('7', 'Tag template', []), template('8', 'Variable template', [])], tags: [tag('cvt_2_7')], variables: [variable('cvt_2_8', 'From template')] }))).toEqual([]);
+  });
+});
+
+describe('RSK-10 analytics or session-recording tag that doesn\'t wait for consent', () => {
+  const clarity = template('30', 'Microsoft Clarity - Official', [{ id: 'inject_script' }]);
+  it('fires on an analytics template, the Hotjar tag type and Custom HTML loading Hotjar', () => {
+    const html = tag('html', { consent: 'NOT_SET', params: [tpl('html', '<script src="https://static.hotjar.com/c/hotjar-1.js"></script>')] });
+    const f = run(RSK_10, container({ templates: [clarity], tags: [tag('cvt_2_30', { consent: 'NOT_SET' }), tag('hjtc', { consent: 'NOT_SET' }), html] }));
+    expect(f).toHaveLength(3);
+    expect(f.every((x) => x.severity === 'warning' && x.confidence === 'definite')).toBe(true);
+  });
+  it('flags "No additional consent required" as a check-in-preview item', () => {
+    const [f] = run(RSK_10, container({ templates: [clarity], tags: [tag('cvt_2_30', { consent: 'NOT_NEEDED' })] }));
+    expect(f).toMatchObject({ severity: 'warning', confidence: 'check-in-preview' });
+    expect(f!.message).toMatch(/No additional consent required/);
+  });
+  it('stays quiet when consent is set, for Google tags, for marketing tags (RSK-01\'s job) and for paused tags', () => {
+    const pixel = tag('html', { consent: 'NOT_SET', params: [tpl('html', '<script>fbq("init","1")</script>')] });
+    const f = run(RSK_10, container({
+      templates: [clarity],
+      tags: [tag('cvt_2_30', { consent: 'NEEDED' }), tag('cvt_2_30', { consent: 'NOT_SET', paused: true }), tag('gaawe', { consent: 'NOT_SET' }), pixel],
+    }));
+    expect(f).toEqual([]);
   });
 });

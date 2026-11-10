@@ -20,11 +20,24 @@ export const DEDUCTION: Record<Severity, number> = { critical: 30, warning: 10, 
 export interface AreaScore {
   area: Area;
   label: string;
-  score: number;
+  /** null when the container has nothing in this area to judge (no GA4 tags, no Google Ads tags): a 100 would mislead. */
+  score: number | null;
   deductions: Array<{ ruleId: string; title: string; severity: Severity; confidence: string; findings: number; points: number }>;
 }
 
-export function healthScores(result: AuditResult): AreaScore[] {
+/** Tag types that mean an area is in use. Areas not listed (triggers, consent, hygiene) always apply. */
+const AREA_TAG_TYPES: Partial<Record<Area, readonly string[]>> = {
+  ga4: ['gaawe', 'googtag'],
+  ads: ['awct', 'sp', 'gclidw', 'awud', 'flc', 'fls'],
+};
+
+/** Areas the container has nothing in, from its tag types. Pass the result to healthScores. */
+export function unusedAreas(tagTypes: Iterable<string>): Area[] {
+  const types = new Set(tagTypes);
+  return (Object.entries(AREA_TAG_TYPES) as Array<[Area, readonly string[]]>).filter(([, keys]) => !keys.some((k) => types.has(k))).map(([a]) => a);
+}
+
+export function healthScores(result: AuditResult, unused: readonly Area[] = []): AreaScore[] {
   return AREAS.map(({ id, label }) => {
     const deductions = result.issues
       .filter((i) => i.area === id)
@@ -34,7 +47,7 @@ export function healthScores(result: AuditResult): AreaScore[] {
         return { ruleId: i.ruleId, title: i.title, severity: i.severity, confidence: i.confidence, findings: i.findings.length, points };
       })
       .filter((d) => d.points > 0);
-    const score = Math.max(0, 100 - deductions.reduce((s, d) => s + d.points, 0));
+    const score = unused.includes(id) && !deductions.length ? null : Math.max(0, 100 - deductions.reduce((s, d) => s + d.points, 0));
     return { area: id, label, score, deductions };
   });
 }

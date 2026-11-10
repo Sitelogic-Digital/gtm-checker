@@ -1,7 +1,7 @@
 import { resolveConstant } from '../../ga4';
 import type { Tag } from '../../model';
 import { paramString } from '../../params';
-import { ALL_STATES, list, PAGE_LOAD_TRIGGERS, tagEntity, WHERE } from '../helpers';
+import { ALL_STATES, isConsentTrigger, list, PAGE_LOAD_TRIGGERS, tagEntity, WHERE } from '../helpers';
 import type { FindingDraft, Rule, RuleContext } from '../types';
 
 interface PageViewSender {
@@ -35,20 +35,21 @@ function senders(ctx: RuleContext): PageViewSender[] {
     let mid: string | undefined;
     let kind: PageViewSender['kind'] | undefined;
     if (t.type.key === 'googtag' && googleTagSendsPageView(t, ctx)) {
+      // A lookup-table or other non-constant ID stays as written ("{{GA4 Lookup}}"); the checks still apply.
       mid = resolveConstant(paramString(t.params, 'tagId') ?? '', ctx.graph);
       kind = 'google-tag';
     } else if (t.type.key === 'gaawe') {
       const send = ctx.events.flatMap((e) => e.sends).find((s) => s.tagId === t.id);
       if (send?.eventName === 'page_view') {
-        mid = send.measurementId;
+        mid = send.measurementId ?? send.measurementIdRaw;
         kind = 'event-tag';
       }
     }
-    if (!kind || !mid || !/^G-/i.test(mid)) continue;
+    if (!kind || !mid || !(/^G-/i.test(mid) || /^\{\{.+\}\}$/.test(mid.trim()))) continue;
     const types = triggerTypes(t.firingTriggerIds);
     out.push({
       tag: t,
-      measurementId: mid.toUpperCase(),
+      measurementId: /^G-/i.test(mid) ? mid.toUpperCase() : mid.trim(),
       kind,
       onLoad: types.some((x) => PAGE_LOAD_TRIGGERS.has(x)),
       onHistory: types.includes('HISTORY_CHANGE'),
@@ -56,7 +57,8 @@ function senders(ctx: RuleContext): PageViewSender[] {
         kind === 'google-tag'
           ? t.firingTriggerIds
               .map((id) => ctx.graph.triggersById.get(id))
-              .filter((x) => x && !PAGE_LOAD_TRIGGERS.has(x.type.key) && x.type.key !== 'HISTORY_CHANGE')
+              // A consent update fires once per page after the visitor chooses; it's the usual way to hold the Google tag back.
+              .filter((x) => x && !PAGE_LOAD_TRIGGERS.has(x.type.key) && x.type.key !== 'HISTORY_CHANGE' && !isConsentTrigger(x))
               .map((x) => x!.name)
           : [],
       triggerIds: t.firingTriggerIds,

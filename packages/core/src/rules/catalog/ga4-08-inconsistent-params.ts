@@ -5,11 +5,12 @@ export const GA4_08: Rule = {
   id: 'GA4-08',
   title: 'Same event sent with different parameters',
   area: 'ga4',
-  severity: 'warning',
+  // Housekeeping since 2026-11-10: different forms sending different fields under one event name is usually intentional.
+  severity: 'housekeeping',
   confidence: 'definite',
   appliesTo: ALL_STATES,
-  why: 'When several tags send the same event name with different parameters, some events arrive with a parameter and some without. Reports filtered on that parameter quietly undercount, and the "(not set)" rows are hard to trace back.',
-  fix: 'Give every tag that sends this event the same parameters. The easiest way is one shared Event Settings variable for the event, with only the genuinely different values on each tag.',
+  why: 'Several tags send this event name with different parameters. That\'s often intentional, such as two forms that collect different fields. Where it isn\'t, reports filtered on a missing parameter quietly undercount and show "(not set)" rows that are hard to trace back.',
+  fix: 'If the difference is intentional, there\'s nothing to change. If every tag should send the same parameters, use one shared Event Settings variable for the event, with only the genuinely different values on each tag.',
   where: WHERE.tags,
   run({ events }) {
     const out: FindingDraft[] = [];

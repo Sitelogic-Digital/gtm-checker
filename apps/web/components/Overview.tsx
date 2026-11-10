@@ -3,7 +3,7 @@
 import { SCORE_METHOD, SEVERITY_ORDER } from '@gtm-audit/core';
 import { useState } from 'react';
 import type { AuditBundle } from '../lib/audit';
-import { Highlight } from './Highlight';
+import { SummarySentence } from './SummarySentence';
 import { ConfidenceMark, plural, SeverityBadge } from './ui';
 
 export function Overview({ b }: { b: AuditBundle }) {
@@ -30,7 +30,7 @@ export function Overview({ b }: { b: AuditBundle }) {
     <div className="stack-lg">
       <section className="sentences" aria-label="Summary">
         {b.overview.map((s, i) => (
-          <p key={i}><Highlight text={s} numbers /></p>
+          <p key={i}><SummarySentence s={s} /></p>
         ))}
       </section>
 
@@ -45,6 +45,13 @@ export function Overview({ b }: { b: AuditBundle }) {
             return (
               <div key={s.area} className="score">
                 <span className="label-caps">{s.label}</span>
+                {s.score === null ? (
+                  <>
+                    <span className="score-value score-none">Not used</span>
+                    <p className="note">There are no {s.area === 'ga4' ? 'GA4' : 'Google Ads'} tags in this container, so there&rsquo;s nothing to score.</p>
+                  </>
+                ) : (
+                  <>
                 <span className="score-value">
                   {s.score}
                   <small>/ 100</small>
@@ -69,6 +76,8 @@ export function Overview({ b }: { b: AuditBundle }) {
                     <p className="note">Nothing found in this area.</p>
                   )}
                 </div>
+                  </>
+                )}
               </div>
             );
           })}
@@ -77,7 +86,7 @@ export function Overview({ b }: { b: AuditBundle }) {
       </section>
 
       <section aria-labelledby="top-h" className="stack">
-        <h2 id="top-h" className="h3">Fix these first</h2>
+        <h2 id="top-h" className="h3">Check and/or fix these first</h2>
         {top.length ? (
           <ol className="top-issues">
             {top.map((i) => (

@@ -22,6 +22,8 @@ import { TRG_03 } from './catalog/trg-03-unfiltered-click';
 import { TRG_04 } from './catalog/trg-04-custom-event-casing';
 import { TRG_05 } from './catalog/trg-05-form-validation';
 import { TRG_06 } from './catalog/trg-06-unused-trigger';
+import { RSK_09 } from './catalog/rsk-09-unused-template';
+import { RSK_10 } from './catalog/rsk-10-analytics-consent';
 import { runRules } from './engine';
 import type { AuditResult, Rule } from './types';
 import type { ContainerModel } from '../model';
@@ -34,7 +36,7 @@ import type { ContainerModel } from '../model';
 export const STARTER_RULES: readonly Rule[] = [
   GA4_01, GA4_02, GA4_03, GA4_04, GA4_05, GA4_07, GA4_08, GA4_09, GA4_10, GA4_11,
   TRG_01, TRG_02, TRG_03, TRG_04, TRG_05, TRG_06,
-  RSK_01, RSK_02, RSK_03, RSK_04, RSK_05, RSK_06, RSK_07, RSK_08,
+  RSK_01, RSK_02, RSK_03, RSK_04, RSK_05, RSK_06, RSK_07, RSK_08, RSK_09, RSK_10,
 ];
 
 export function audit(model: ContainerModel, rules: readonly Rule[] = STARTER_RULES): AuditResult {

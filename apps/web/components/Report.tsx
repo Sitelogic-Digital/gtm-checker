@@ -3,6 +3,7 @@
 import { SCORE_METHOD, SEVERITY_ORDER, type IssueGroup } from '@gtm-audit/core';
 import { formatExportTime, type AuditBundle } from '../lib/audit';
 import { Highlight } from './Highlight';
+import { SummarySentence } from './SummarySentence';
 import { ConfidenceMark, distinctTexts, plural, sentenceShape, SeverityBadge } from './ui';
 
 /** Affected items listed per issue before the report says "and N more". */
@@ -42,7 +43,7 @@ export function Report({ b }: { b: AuditBundle }) {
       <section className="report-section">
         <h2 className="report-h2">Summary</h2>
         <div className="report-sentences">
-          {b.overview.map((s, i) => <p key={i}><Highlight text={s} numbers /></p>)}
+          {b.overview.map((s, i) => <p key={i}><SummarySentence s={s} links={false} /></p>)}
         </div>
       </section>
 
@@ -52,7 +53,7 @@ export function Report({ b }: { b: AuditBundle }) {
           {b.scores.map((s) => (
             <div key={s.area} className="report-score">
               <span className="label-caps">{s.label}</span>
-              <span className="report-score-value">{s.score}<small> / 100</small></span>
+              {s.score === null ? <span className="report-score-value report-score-none">Not used</span> : <span className="report-score-value">{s.score}<small> / 100</small></span>}
             </div>
           ))}
         </div>

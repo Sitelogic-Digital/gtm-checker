@@ -46,7 +46,7 @@ export default function Page() {
   // Move focus to the view heading when a container loads or the view changes, so screen readers
   // announce the new page. A deep link to a rule (#risks/RSK-01) lets Risks focus that issue instead.
   useEffect(() => {
-    if (bundle && !route.rule) document.getElementById('view-title')?.focus();
+    if (bundle && !(route.view === 'risks' && route.rule)) document.getElementById('view-title')?.focus();
   }, [bundle, route.view, route.rule]);
 
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function Page() {
           </div>
           {route.view === 'overview' && <Overview b={bundle} />}
           {route.view === 'events' && <EventMap b={bundle} />}
-          {route.view === 'triggers' && <Triggers b={bundle} />}
+          {route.view === 'triggers' && <Triggers b={bundle} initialFilter={route.rule} />}
           {route.view === 'risks' && <Risks b={bundle} focusRule={route.rule} />}
           <footer className="page-foot stack">
             <p className="note">
